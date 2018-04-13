@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>Login Page</title>
+        <link rel="stylesheet" type="text/css" href="style.css" />
+        <script type="text/javascript">
+        //<![CDATA[
+        function clearMessage() {
+            try {
+                var name = window.parent.frames["message"].document.getElementById("username");
+                if (name != "") {
+                    window.parent.frames["message"].location.reload();
+                }
+            } catch (e) { }
+        }
+        
+        //username input checking
+       function checkInput() {
+            var inputname = document.getElementById("name").value;
+            //username cannot be empty
+            if (inputname == null || inputname == ""){
+                alert("Please enter a name!");
+                return false;
+            }
+            //username cannot contain illeagl character
+            var format = /[!@#$%^&*()+\-=\[\]{};':"\\|,.<>\/?\s]+/;
+            if(format.test(inputname)){
+                alert("Invalid user name!\nPlease don't use space and following characters.\n\"\':;<>()[]{}!@#$%^&*-+=");
+                return false;
+            }
+            if(document.getElementById("image").files.length == 0){
+                alert("Please upload an image profile.");
+                return false;
+            }
+            if (!document.getElementById("image").files[0].name.match(/.(jpg|jpeg|png|gif)$/i)){
+                alert("Sorry, only JPG, JPEG, PNG & GIF files are allowed.");
+                return false;
+            }
+        }
+        //]]>
+        </script>
+    </head>
+
+    <body onload="clearMessage()">
+        <form enctype="multipart/form-data" method="post" action="login.php" onsubmit="return checkInput()">
+            <table border="0" cellpadding="5" cellspacing="0">
+                <tr>
+                    <td>Please enter your user name:</td>
+                    <td><input class="text" name="name" id="name" type="text" size="20" maxlength="10" /></td>
+                </tr>
+                <tr>
+                    <input type="hidden" name="MAX_FILE_SIZE" value="640000">
+                    <td>Please upload an image profile:</td>
+                    <td><input name="userfile" id="image" type="file"></td>
+                </tr>
+                <tr align="center">
+                    <td colspan="2"><input class="button" type="submit" value="Go!" name="submit" style="width: 150px" /></td>
+                </tr>
+            </table>
+        </form>
+    </body>
+</html>

@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>jQuery UI Autocomplete - Categories</title>
+  <link rel="stylesheet" href="jquery-ui.css">
+  <script src="jquery-1.11.3.js"></script>
+  <script src="jquery-ui.js"></script>
+  <link rel="stylesheet" href="style.css">
+  <style>
+  .ui-autocomplete {
+    max-height: 250px;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  * html .ui-autocomplete {
+    height: 250px;
+  }
+  .ui-autocomplete-category {
+    font-weight: bold;
+    padding: .2em .4em;
+    margin: .8em 0 .2em;
+    line-height: 1.5;
+    color: red;
+  }
+	  body {
+	    font-weight: bold;
+	}
+
+	.bold-text {
+	    color: blue;
+	}
+	</style>
+
+  <script>
+  var data = [
+      { label: "sharks", category: "" },
+      { label: "ducks", category: "" },
+      { label: "76ers", category: "Atlantic" },
+      { label: "celtics", category: "Atlantic" },
+      { label: "knicks", category: "Atlantic" },
+      { label: "nets", category: "Atlantic" },
+      { label: "raptors", category: "Atlantic" },
+      { label: "bucks", category: "Central" },
+      { label: "bulls", category: "Central" },
+      { label: "cavaliers", category: "Central" },
+      { label: "pistons", category: "Central" },
+      { label: "pacers", category: "Central" },
+      { label: "bobcats", category: "Southeast" },
+      { label: "hawks", category: "Southeast" },
+      { label: "heat", category: "Southeast" },
+      { label: "magic", category: "Southeast" },
+      { label: "wizards", category: "Southeast" },
+      { label: "blazers", category: "Northwest" },
+      { label: "jazz", category: "Northwest" },
+      { label: "nuggets", category: "Northwest" },
+      { label: "thunder", category: "Northwest" },
+      { label: "timberwolves", category: "Northwest" },
+      { label: "clippers", category: "Pacific" },
+      { label: "kings", category: "Pacific" },
+      { label: "lakers", category: "Pacific" },
+      { label: "suns", category: "Pacific" },
+      { label: "warriors", category: "Pacific" },
+      { label: "grizzlies", category: "Southwest" },
+      { label: "hornets", category: "Southwest" },
+      { label: "mavericks", category: "Southwest" },
+      { label: "rockets", category: "Southwest" },
+      { label: "spurs", category: "Southwest" }
+    ];
+
+  $(function() {
+
+	$.widget( "custom.myautocomplete", $.ui.autocomplete, {
+	      _create: function() {
+	        this._super();
+	        this.widget().menu( "option", "items", "> :not(.ui-autocomplete-category)" );
+	      },
+
+	      _renderMenu: function( ul, items ) {
+	        var that = this,
+	          currentCategory = "";
+	        $.each( items, function( index, item ) {
+	          var li;
+	          if ( item.category != currentCategory ) {
+	            ul.append( "<li class='ui-autocomplete-category'>" + item.category + "</li>" );
+	            currentCategory = item.category;
+	          }
+	          li = that._renderItemData( ul, item );
+	          if ( item.category ) {
+	            li.attr( "aria-label", item.category + " : " + item.label );
+	          }
+	        });
+	      },
+
+	      _renderItem: function(ul, item){
+				terms = this.term.split(',');
+				term = terms[terms.length - 1].trim();
+				var reg = new RegExp(term, 'g') ;
+				var temp = item.label.replace(reg,"<span class='bold-text'>" + term + "</span>");
+				return $( "<li></li>" )
+        		.data("item.autocomplete", item)
+				.append( "<a>" + temp + "</a>" )
+				.appendTo( ul );				
+			}
+	    });
+
+	function split(val){
+  		return val.split(/,\s*/);
+  	}
+
+  	function extractLast(term){
+  		return split(term).pop();
+  	}
+
+    $( "#search" )
+      // don't navigate away from the field on tab when selecting an item
+      .bind( "keydown", function( event ) {
+        if ( event.keyCode === $.ui.keyCode.TAB &&
+            $( this ).myautocomplete( "instance" ).menu.active ) {
+          event.preventDefault();
+        }
+      })
+      .myautocomplete({
+        minLength: 0,
+        highlightClass: "bold-text",
+        source: function( request, response ) {
+          // delegate back to autocomplete, but extract the last term
+          response( $.ui.autocomplete.filter(
+            data, extractLast( request.term ) ) );
+        },
+        focus: function() {
+          // prevent value inserted on focus
+          return false;
+        },
+        select: function( event, ui ) {
+          var terms = split( this.value );
+          // remove the current input
+          terms.pop();
+          // add the selected item
+          terms.push( ui.item.value );
+          // add placeholder to get the comma-and-space at the end
+          terms.push( "" );
+          this.value = terms.join( ", " );
+          return false;
+        }
+       });
+      	
+  });
+  </script>
+
+</head>
+<body>
+ 
+<label for="search">Search: </label>
+<input id="search">
+
+</body>
+</html>
+ 
